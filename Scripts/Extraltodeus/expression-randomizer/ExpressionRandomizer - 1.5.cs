@@ -14,12 +14,68 @@ namespace extraltodeuslExpRandPlugin {
             "Arms",
             "Body",
             "Chest",
+            "Finger",
             "Hip",
             "Legs",
             "Neck",
             "Feet",
             "Waist"
         };
+
+        string[] defaultOn =
+        {
+            "Brow Outer Up Left",
+            "Brow Outer Up Right",
+						"Brow Inner Up Left",
+            "Brow Inner Up Right",
+            "Concentrate",
+            "Flirting",
+						"Pupils Dialate",
+						"Eyes Squint Left",
+            "Eyes Squint Right",
+						"Lips Pucker"
+        };
+
+				string[] preset1 =
+				{
+						"Brow Inner Up Left",
+						"Brow Inner Up Right",
+						"01-Extreme Pleasure",
+						"Concentrate",
+						"Confused",
+						"Pain",
+						"Eyes Squint Left",
+						"Eyes Squint Right",
+						"Surprise",
+						"Mouth Smile Simple",
+						"Pupils Dialate"
+				};
+
+				string[] preset2 =
+				{
+						"Brow Inner Up Left",
+						"Brow Inner Up Right",
+						"Brow Outer Down Left",
+						"Brow Outer Down Right",
+						"Brow Squeeze",
+						"Confused",
+						"Sad",
+						"Afraid",
+						"Mouth Frown",
+						"Mouth Narrow",
+						"Pain",
+						"Eyes Closed",
+						"Eyes Squint Left",
+						"Eyes Squint Right",
+						"Fear",
+						"Pupils Dialate",
+				};
+
+				// particular morph names to add
+				string[] tailorList =
+				{
+					"Pupils Dialate",
+				};
 
         string[] poseRegion =
         {
@@ -34,6 +90,7 @@ namespace extraltodeuslExpRandPlugin {
         Dictionary<string, UIDynamicButton> buttons = new Dictionary<string, UIDynamicButton>();
         Dictionary<string, string> toggleRelations = new Dictionary<string, string>();
 
+				protected JSONStorableFloat masterSpeedSlider;
         protected JSONStorableFloat minSlider;
         protected JSONStorableFloat maxSlider;
         protected JSONStorableFloat multiSlider;
@@ -45,63 +102,65 @@ namespace extraltodeuslExpRandPlugin {
 
         protected void UpdateRandomParams()
         {
-            JSONStorable geometry = containingAtom.GetStorableByID("geometry");
-            DAZCharacterSelector character = geometry as DAZCharacterSelector;
-            GenerateDAZMorphsControlUI morphControl = character.morphsControlUI;
+          JSONStorable geometry = containingAtom.GetStorableByID("geometry");
+          DAZCharacterSelector character = geometry as DAZCharacterSelector;
+          GenerateDAZMorphsControlUI morphControl = character.morphsControlUI;
 
-            // define the random values to switch to
-            morphControl.GetMorphDisplayNames().ForEach((name) =>
-            {
-                DAZMorph morph = morphControl.GetMorphByDisplayName(name);
-                if (toggles.ContainsKey(name) == false)
-                {
-                    return;
-                }
 
-                if (toggles[name].toggle.isOn)
-                {
-                    if (morph.animatable == false)
-                    {
-                        float valeur = UnityEngine.Random.Range(minSlider.val, maxSlider.val) * multiSlider.val;
-                        newMorphValues[name] = valeur;
-                    }
-                }
-            });
+					Dictionary<string, UIDynamicToggle> togglesOn = toggles.Where(t => t.Value.toggle.isOn).ToDictionary(p => p.Key, p => p.Value);
+
+					// define the random values to switch to
+					foreach(KeyValuePair<string, UIDynamicToggle> entry in togglesOn)
+					{
+						string name = entry.Key;
+						if (name != "Play")
+						{
+							DAZMorph morph = morphControl.GetMorphByDisplayName(name);
+							if (morph.animatable == false)
+							{
+								float valeur = UnityEngine.Random.Range(minSlider.val, maxSlider.val) * multiSlider.val;
+								newMorphValues[name] = valeur;
+							}
+						}
+					}
         }
 
-        protected void Update()
-        {
-            timer -= Time.deltaTime;
-            if (timer <= 0f)
-            {
-                timer = animWaitSlider.val;
-                UpdateRandomParams();
-            }
-        }
+				void Update() {
+					timer -= Time.deltaTime;
+					if (timer <= 0f)
+					{
+							timer = animWaitSlider.val/masterSpeedSlider.val;
+							UpdateRandomParams();
+					}
+				}
 
         protected void FixedUpdate()
         {
             if (toggles["Play"].toggle.isOn)
             {
-                JSONStorable geometry = containingAtom.GetStorableByID("geometry");
-                DAZCharacterSelector character = geometry as DAZCharacterSelector;
-                GenerateDAZMorphsControlUI morphControl = character.morphsControlUI;
 
-                // morph progressively every morphs to their new values
-                morphControl.GetMorphDisplayNames().ForEach((name) =>
-                {
-                    DAZMorph morph = morphControl.GetMorphByDisplayName(name);
-                    if (toggles.ContainsKey(name) && toggles[name].toggle.isOn)
-                    {
-                        if (morph.animatable == false)
-                        {
-                            float valeur = Mathf.Lerp(CurrentMorphsValues[name], newMorphValues[name], Time.deltaTime * animLengthSlider.val);
-                            morph.morphValue = valeur;
-                        }
-                    }
-                });
-                UpdateCurrentMorphs();
-            }    
+
+              JSONStorable geometry = containingAtom.GetStorableByID("geometry");
+              DAZCharacterSelector character = geometry as DAZCharacterSelector;
+              GenerateDAZMorphsControlUI morphControl = character.morphsControlUI;
+
+							Dictionary<string, UIDynamicToggle> togglesOn = toggles.Where(t => t.Value.toggle.isOn).ToDictionary(p => p.Key, p => p.Value);
+
+              // morph progressively every morphs to their new values
+							foreach(KeyValuePair<string, UIDynamicToggle> entry in togglesOn)
+							{
+								string name = entry.Key;
+								if (name != "Play")
+								{
+									DAZMorph morph = morphControl.GetMorphByDisplayName(name);
+									if (morph.animatable == false)
+									{
+										float valeur = Mathf.Lerp(CurrentMorphsValues[name], newMorphValues[name], Time.deltaTime * animLengthSlider.val * masterSpeedSlider.val);
+										CurrentMorphsValues[name] = morph.morphValue = valeur;
+									}
+								}
+							}
+            }
         }
 
         private void UpdateInitialMorphs()
@@ -111,7 +170,8 @@ namespace extraltodeuslExpRandPlugin {
             GenerateDAZMorphsControlUI morphControl = character.morphsControlUI;
             morphControl.GetMorphDisplayNames().ForEach((name) =>
             {
-                initialMorphValues[name] = morphControl.GetMorphByDisplayName(name).morphValue;
+                if (toggles.ContainsKey(name))
+                    initialMorphValues[name] = morphControl.GetMorphByDisplayName(name).morphValue;
             });
         }
 
@@ -148,8 +208,31 @@ namespace extraltodeuslExpRandPlugin {
             {
                 if (toggleRelations.ContainsKey(name))
                 {
-                    DAZMorph morph = morphControl.GetMorphByDisplayName(name);
-                    morph.morphValue = initialMorphValues[name];
+                    if (toggles.ContainsKey(name))
+                    {
+                        DAZMorph morph = morphControl.GetMorphByDisplayName(name);
+                        morph.morphValue = initialMorphValues[name];
+                    }
+
+                }
+            });
+        }
+
+        private void ZeroMorphs()
+        {
+            JSONStorable geometry = containingAtom.GetStorableByID("geometry");
+            DAZCharacterSelector character = geometry as DAZCharacterSelector;
+            GenerateDAZMorphsControlUI morphControl = character.morphsControlUI;
+
+            morphControl.GetMorphDisplayNames().ForEach((name) =>
+            {
+                if (toggleRelations.ContainsKey(name))
+                {
+                    if (toggles.ContainsKey(name) && toggles[name].toggle.isOn)
+                    {
+                        DAZMorph morph = morphControl.GetMorphByDisplayName(name);
+                        morph.morphValue = 0;
+                    }
                 }
             });
         }
@@ -159,9 +242,9 @@ namespace extraltodeuslExpRandPlugin {
                 UpdateInitialMorphs();
                 UpdateNewMorphs();
                 UpdateCurrentMorphs();
-                
+
                 #region Sliders
-                minSlider = new JSONStorableFloat("Minimum value", -0.3f, -1f, 1.0f, true);
+                minSlider = new JSONStorableFloat("Minimum value", -0.2f, -1f, 1.0f, true);
                 minSlider.storeType = JSONStorableParam.StoreType.Full;
                 RegisterFloat(minSlider);
                 CreateSlider(minSlider, false);
@@ -186,7 +269,7 @@ namespace extraltodeuslExpRandPlugin {
                 HashSet<string> LastRegions = new HashSet<string>();
                 Dictionary<string, string> temporaryToggles = new Dictionary<string, string>();
 
-                JSONStorableBool playingBool = new JSONStorableBool("Play", false);
+                JSONStorableBool playingBool = new JSONStorableBool("Play", true);
                 playingBool.storeType = JSONStorableParam.StoreType.Full;
                 RegisterBool(playingBool);
                 toggles["Play"] = CreateToggle((playingBool), false);
@@ -195,11 +278,11 @@ namespace extraltodeuslExpRandPlugin {
                 {
                     DAZMorph morph = morphControl.GetMorphByDisplayName(name);
                     regions.Add(morph.region);
-                    
+
                     if (
-                         poseRegion.Any((str) => morph.region.Contains(str)) &&
-                        !bodyRegion.Any((str) => morph.region.Contains(str)) &&
-                        !morph.region.Contains("Reloaded")
+                         (poseRegion.Any((str) => morph.region.Contains(str)) &&
+                        !bodyRegion.Any((str) => morph.region.Contains(str))) ||
+												tailorList.Any((str) => name.Contains(str))
                     )
                     {
                         string[] posePaths = Regex.Split(morph.region, "/");
@@ -224,6 +307,7 @@ namespace extraltodeuslExpRandPlugin {
                         toggle.toggle.isOn = true;
                     });
                 });
+
                 UIDynamicButton selectNone = CreateButton("Select None", true);
                 selectNone.button.onClick.AddListener(delegate () {
                     toggles.Values.ToList().ForEach((toggle) =>
@@ -232,26 +316,58 @@ namespace extraltodeuslExpRandPlugin {
                     });
                 });
 
-                foreach (string LastRegion in LastRegions)
-                {
-                    buttons[LastRegion] = CreateButton(LastRegion, true);
-                    buttons[LastRegion].button.onClick.AddListener(delegate () {
-                        ResetMorphs();
-                        foreach (KeyValuePair<string, UIDynamicToggle> entry in toggles)
-                        {
-                            if (toggleRelations.ContainsKey(entry.Key))
-                            {
-                                entry.Value.toggle.isOn = (toggleRelations[entry.Key] == LastRegion);
-                            }
-                        }
-                    });
-                }
+								UIDynamicButton selectDefault = CreateButton("Select Default", true);
+								selectDefault.button.onClick.AddListener(delegate () {
+										foreach (KeyValuePair<string, UIDynamicToggle> entry in toggles)
+										{
+											if (entry.Key != "Play")
+												toggles[entry.Key].toggle.isOn = defaultOn.Any((str) => entry.Key.Equals(str));
+										};
+								});
+
+								UIDynamicButton selectPres1 = CreateButton("Select preset 1", true);
+								selectPres1.button.onClick.AddListener(delegate () {
+										foreach (KeyValuePair<string, UIDynamicToggle> entry in toggles)
+										{
+											if (entry.Key != "Play")
+												toggles[entry.Key].toggle.isOn = preset1.Any((str) => entry.Key.Equals(str));
+										};
+								});
+
+								UIDynamicButton selectPres2 = CreateButton("Select preset 2", true);
+								selectPres2.button.onClick.AddListener(delegate () {
+										foreach (KeyValuePair<string, UIDynamicToggle> entry in toggles)
+										{
+											if (entry.Key != "Play")
+												toggles[entry.Key].toggle.isOn = preset2.Any((str) => entry.Key.Equals(str));
+										};
+								});
+								CreateSpacer(true).height = 10f;;
+                // foreach (string LastRegion in LastRegions)
+                // {
+                //     buttons[LastRegion] = CreateButton(LastRegion, true);
+                //     buttons[LastRegion].button.onClick.AddListener(delegate () {
+                //         ResetMorphs();
+                //         foreach (KeyValuePair<string, UIDynamicToggle> entry in toggles)
+                //         {
+                //             if (toggleRelations.ContainsKey(entry.Key))
+                //             {
+                //                 entry.Value.toggle.isOn = (toggleRelations[entry.Key] == LastRegion);
+                //             }
+                //         }
+                //     });
+                // }
                 #endregion
 
                 #region Region checkbox generation
                 foreach (KeyValuePair<string, string> entry in temporaryToggles)
                 {
-                    JSONStorableBool checkBoxTick = new JSONStorableBool(entry.Value, false);
+                    JSONStorableBool checkBoxTick = new JSONStorableBool(entry.Value, defaultOn.Any((str) => entry.Key.Equals(str)), (bool on)=>{
+											if (!on && entry.Key != "Play") {
+												DAZMorph morph = morphControl.GetMorphByDisplayName(entry.Key);
+												morph.morphValue = 0;
+											}
+										});
                     checkBoxTick.storeType = JSONStorableParam.StoreType.Full;
                     RegisterBool(checkBoxTick);
 
@@ -262,34 +378,49 @@ namespace extraltodeuslExpRandPlugin {
                 #endregion
 
                 //CreateSpacer();
-
-                #region SetAsDef button
-                UIDynamicButton setasdefButton = CreateButton("Set current as default", false);
-                setasdefButton.button.onClick.AddListener(delegate ()
-                {
-                    UpdateInitialMorphs();
-                });
-                #endregion
-
-                UIDynamicButton animatableButton = CreateButton("Clear Animatable", false);
+                UIDynamicButton animatableButton = CreateButton("Clear Animatable (from selected)", false);
                 animatableButton.button.onClick.AddListener(delegate ()
                 {
                     morphControl.GetMorphDisplayNames().ForEach((name) =>
                     {
                         DAZMorph morph = morphControl.GetMorphByDisplayName(name);
-                        morph.animatable = false;
+                        if (toggles.ContainsKey(name) && toggles[name].toggle.isOn)
+                            morph.animatable = false;
                     });
                 });
+
+                #region SetAsDef button
+                UIDynamicButton setasdefButton = CreateButton("Set current state as default", false);
+                setasdefButton.button.onClick.AddListener(delegate ()
+                {
+                  UpdateInitialMorphs();
+                });
+                #endregion
 
                 #region Reset button
                 UIDynamicButton resetButton = CreateButton("Reset", false);
                 resetButton.button.onClick.AddListener(delegate ()
                 {
-                    ResetMorphs();
+									toggles["Play"].toggle.isOn = false;
+                  ResetMorphs();
                 });
                 #endregion
 
-                animWaitSlider = new JSONStorableFloat("Loop length", 1f, 0.1f, 20f, true);
+                #region ZeroMorph button
+                UIDynamicButton ZeroMorphButton = CreateButton("Zero Selected", false);
+                ZeroMorphButton.button.onClick.AddListener(delegate ()
+                {
+									toggles["Play"].toggle.isOn = false;
+                  ZeroMorphs();
+                });
+                #endregion
+
+								masterSpeedSlider = new JSONStorableFloat("Master speed", 1f, 0f, 10f, true);
+								masterSpeedSlider.storeType = JSONStorableParam.StoreType.Full;
+								RegisterFloat(masterSpeedSlider);
+								CreateSlider(masterSpeedSlider, false);
+
+                animWaitSlider = new JSONStorableFloat("Loop length", 2f, 0.1f, 20f, true);
                 animWaitSlider.storeType = JSONStorableParam.StoreType.Full;
                 RegisterFloat(animWaitSlider);
                 CreateSlider(animWaitSlider, false);
