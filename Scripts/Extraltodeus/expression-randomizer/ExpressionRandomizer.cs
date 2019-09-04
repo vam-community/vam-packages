@@ -7,67 +7,14 @@ using SimpleJSON;
 using System.Threading;
 using System.Text.RegularExpressions;
 
-namespace extraaltoPlugin {
+namespace extraltodeuslExpRandPlugin {
 	public class ExpressionRandomizer : MVRScript {
-        string[] defaultOff =
-        {
-            "Actor",
-            "DieTrying",
-            "_Alien_Actor",
-            "_Alien_Body",
-            "_Alien_Face",
-            "_Alien_Head",
-            "Reloaded",
-            "Hidden",
-            "Ears",
-            "Pose Controls"
-        };
-
-        string[] alwaysOff =
-        {
-            "DieTrying",
-            "Alien",
-            "Reloaded",
-            "Hidden",
-        };
-
-        string[] defaultOn =
-        {
-            "Ears",
-            "Eyes",
-            "Face",
-            "Mouth",
-            "Head",
-            "Nose",
-            "Arms",
-            "Body",
-            "Chest",
-            "Hip",
-            "Hands",
-            "Legs",
-            "Neck",
-            "Feet",
-            "Waist"
-
-        };
-
-        string[] headRegion =
-        {
-            "Ears",
-            "Eyes",
-            "Face",
-            "Mouth",
-            "Head",
-            "Nose"
-        };
-
         string[] bodyRegion =
         {
             "Arms",
             "Body",
             "Chest",
             "Hip",
-            "Hands",
             "Legs",
             "Neck",
             "Feet",
@@ -83,12 +30,79 @@ namespace extraaltoPlugin {
         Dictionary<string, float>  initialMorphValues   = new Dictionary<string, float>();
         Dictionary<string, float>  newMorphValues       = new Dictionary<string, float>();
         Dictionary<string, float>  CurrentMorphsValues  = new Dictionary<string, float>();
+        Dictionary<string, UIDynamicToggle> toggles = new Dictionary<string, UIDynamicToggle>();
+        Dictionary<string, UIDynamicButton> buttons = new Dictionary<string, UIDynamicButton>();
+        Dictionary<string, string> toggleRelations = new Dictionary<string, string>();
 
         protected JSONStorableFloat minSlider;
         protected JSONStorableFloat maxSlider;
         protected JSONStorableFloat multiSlider;
         protected JSONStorableFloat animLengthSlider;
+        protected JSONStorableFloat animWaitSlider;
         protected JSONStorableBool  play;
+        protected float timer;
+        protected float forceTimer;
+
+        protected void UpdateRandomParams()
+        {
+            JSONStorable geometry = containingAtom.GetStorableByID("geometry");
+            DAZCharacterSelector character = geometry as DAZCharacterSelector;
+            GenerateDAZMorphsControlUI morphControl = character.morphsControlUI;
+
+            // define the random values to switch to
+            morphControl.GetMorphDisplayNames().ForEach((name) =>
+            {
+                DAZMorph morph = morphControl.GetMorphByDisplayName(name);
+                if (toggles.ContainsKey(name) == false)
+                {
+                    return;
+                }
+
+                if (toggles[name].toggle.isOn)
+                {
+                    if (morph.animatable == false)
+                    {
+                        float valeur = UnityEngine.Random.Range(minSlider.val, maxSlider.val) * multiSlider.val;
+                        newMorphValues[name] = valeur;
+                    }
+                }
+            });
+        }
+
+        protected void Update()
+        {
+            timer -= Time.deltaTime;
+            if (timer <= 0f)
+            {
+                timer = animWaitSlider.val;
+                UpdateRandomParams();
+            }
+        }
+
+        protected void FixedUpdate()
+        {
+            if (toggles["Play"].toggle.isOn)
+            {
+                JSONStorable geometry = containingAtom.GetStorableByID("geometry");
+                DAZCharacterSelector character = geometry as DAZCharacterSelector;
+                GenerateDAZMorphsControlUI morphControl = character.morphsControlUI;
+
+                // morph progressively every morphs to their new values
+                morphControl.GetMorphDisplayNames().ForEach((name) =>
+                {
+                    DAZMorph morph = morphControl.GetMorphByDisplayName(name);
+                    if (toggles.ContainsKey(name) && toggles[name].toggle.isOn)
+                    {
+                        if (morph.animatable == false)
+                        {
+                            float valeur = Mathf.Lerp(CurrentMorphsValues[name], newMorphValues[name], Time.deltaTime * animLengthSlider.val);
+                            morph.morphValue = valeur;
+                        }
+                    }
+                });
+                UpdateCurrentMorphs();
+            }    
+        }
 
         private void UpdateInitialMorphs()
         {
@@ -108,7 +122,8 @@ namespace extraaltoPlugin {
             GenerateDAZMorphsControlUI morphControl = character.morphsControlUI;
             morphControl.GetMorphDisplayNames().ForEach((name) =>
             {
-                newMorphValues[name] = morphControl.GetMorphByDisplayName(name).morphValue;
+                if (toggles.ContainsKey(name))
+                    newMorphValues[name] = morphControl.GetMorphByDisplayName(name).morphValue;
             });
         }
 
@@ -119,7 +134,7 @@ namespace extraaltoPlugin {
             GenerateDAZMorphsControlUI morphControl = character.morphsControlUI;
             morphControl.GetMorphDisplayNames().ForEach((name) =>
             {
-                CurrentMorphsValues[name] = morphControl.GetMorphByDisplayName(name).morphValue;
+                    CurrentMorphsValues[name] = morphControl.GetMorphByDisplayName(name).morphValue;
             });
         }
 
@@ -128,10 +143,14 @@ namespace extraaltoPlugin {
             JSONStorable geometry = containingAtom.GetStorableByID("geometry");
             DAZCharacterSelector character = geometry as DAZCharacterSelector;
             GenerateDAZMorphsControlUI morphControl = character.morphsControlUI;
+
             morphControl.GetMorphDisplayNames().ForEach((name) =>
             {
-                DAZMorph morph = morphControl.GetMorphByDisplayName(name);
-                morph.morphValue = initialMorphValues[name];
+                if (toggleRelations.ContainsKey(name))
+                {
+                    DAZMorph morph = morphControl.GetMorphByDisplayName(name);
+                    morph.morphValue = initialMorphValues[name];
+                }
             });
         }
 
@@ -140,10 +159,6 @@ namespace extraaltoPlugin {
                 UpdateInitialMorphs();
                 UpdateNewMorphs();
                 UpdateCurrentMorphs();
-
-                Dictionary<string, UIDynamicToggle>  toggles          = new Dictionary<string, UIDynamicToggle>();
-                Dictionary<string, UIDynamicButton>  buttons          = new Dictionary<string, UIDynamicButton>();
-                Dictionary<string, string>           toggleRelations  = new Dictionary<string, string>();
                 
                 #region Sliders
                 minSlider = new JSONStorableFloat("Minimum value", -0.3f, -1f, 1.0f, true);
@@ -246,67 +261,6 @@ namespace extraaltoPlugin {
 
                 #endregion
 
-                #region Play Loop
-                
-                new Thread(() =>
-                {
-                    Thread.CurrentThread.IsBackground = true;
-
-                    while (true)
-                    {
-                        if (toggles["Play"].toggle.isOn)
-                        {                   
-                            // define the random values to switch to
-                            morphControl.GetMorphDisplayNames().ForEach((name) =>
-                            {
-                                DAZMorph morph = morphControl.GetMorphByDisplayName(name);
-                                if (toggles.ContainsKey(name) == false)
-                                {
-                                    return;
-                                }
-
-                                if (toggles[name].toggle.isOn)
-                                {
-                                    if (morph.animatable == false)
-                                    {
-                                        float valeur = UnityEngine.Random.Range(minSlider.val, maxSlider.val) * multiSlider.val;
-                                        newMorphValues[name] = valeur;
-                                    }
-                                }
-                            });
-
-                            // morph progressively every morphs to their new values
-                            int etape = (int)(1000 * animLengthSlider.val / 60);
-                            for (int i = 0; i < etape; i++)
-                            {
-
-                                morphControl.GetMorphDisplayNames().ForEach((name) =>
-                                {
-                                    DAZMorph morph = morphControl.GetMorphByDisplayName(name);
-                                    if (toggles.ContainsKey(name) == false)
-                                    {
-                                        return;
-                                    }
-
-                                    if (toggles[name].toggle.isOn)
-                                    {
-                                        if (morph.animatable == false)
-                                        {
-                                            morph.morphValue += ((newMorphValues[name] - CurrentMorphsValues[name]) / (etape)) * 0.99f;
-                                        }
-                                    }
-                                });
-                                System.Threading.Thread.Sleep((int)(1000 * animLengthSlider.val / 60));
-                            }
-                            // update current state without touching the initial value for later reset
-                            UpdateCurrentMorphs();
-                        }
-                    // sleep so no fast empty loop if no morph has been selected
-                    System.Threading.Thread.Sleep((int)(100));
-                    }
-                }).Start();
-                #endregion
-
                 //CreateSpacer();
 
                 #region SetAsDef button
@@ -335,14 +289,15 @@ namespace extraaltoPlugin {
                 });
                 #endregion
 
+                animWaitSlider = new JSONStorableFloat("Loop length", 1f, 0.1f, 20f, true);
+                animWaitSlider.storeType = JSONStorableParam.StoreType.Full;
+                RegisterFloat(animWaitSlider);
+                CreateSlider(animWaitSlider, false);
 
-                animLengthSlider = new JSONStorableFloat("Loop Length (s)", 3.0f, 0.01f, 10f, true);
+                animLengthSlider = new JSONStorableFloat("Morphing speed", 1.0f, 0.1f, 20f, true);
                 animLengthSlider.storeType = JSONStorableParam.StoreType.Full;
                 RegisterFloat(animLengthSlider);
                 CreateSlider(animLengthSlider, false);
-
-
-
             }
             catch (Exception e) {
 				SuperController.LogError("Exception caught: " + e);
@@ -351,6 +306,7 @@ namespace extraaltoPlugin {
 
         void Start()
         {
+            timer = 0f;
             UpdateInitialMorphs();
             UpdateNewMorphs();
         }
