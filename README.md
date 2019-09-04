@@ -8,4 +8,4 @@ Place files in `Scripts/{Author}/{package}/{...file}`, where `{Author}` and `{pa
 
 ## Versioning
 
-Overwrite files in the package rather than keeping all versions side by side. This might change in the future.
+Overwrite files in the package rather than keeping all versions side by side. This allows for easily tracking changes between versions, same as if this was the original repository. This might change in the future.
