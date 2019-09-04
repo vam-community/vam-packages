@@ -8,6 +8,7 @@ namespace VRAdultFun
         {
             public override void OnEnter()
             {
+				currentMouth = "Demure";
                 //interestArousal += 0.25f;
                 //interestValence += 0.1f;
                 morphMouthAction = true;
@@ -20,14 +21,15 @@ namespace VRAdultFun
                 mTongueBendTipTarget = 0.0f;
                 ///mVisFTarget = Random.Range(0.5f,1.0f);
                 mMouthOpenTarget = -1.0f;
+				mMouthOpenWideTarget = 0.0f;
                 mMouthSideLeftTarget = 0.0f;
                 mMouthSideRightTarget = 0.0f;
-                mSmileSimpleLeftTarget = -1.0f;
-                mSmileSimpleRightTarget = -1.0f;
-                mLipsPuckerTarget = Random.Range(0.0f, 0.3f);
+                //mSmileSimpleLeftTarget = -1.0f;
+                //mSmileSimpleRightTarget = -1.0f;
+                mLipsPuckerTarget = Random.Range(0.1f, 0.3f);
                 mLipsPuckerWideTarget = 0.0f;
                 mExcitementTarget = 0.0f;
-                Duration = Random.Range(2.0f, 4.5f) * lookVariation;
+                Duration = Random.Range(1.0f, 2.5f) * lookVariation;
             }
             public override void OnInterrupt(string parameter)
             {
@@ -38,7 +40,8 @@ namespace VRAdultFun
                 morphMouthAction = false;
                 mHappyTarget = 0.0f;
                 mMouthOpenTarget = 0.0f;
-                mTongueInOutTarget = 0.0f;
+                mLipsPuckerTarget = 0.0f;
+				mMouthOpenWideTarget = Random.Range(0.0f,0.2f);
             }
         }
     }

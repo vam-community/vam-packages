@@ -9,14 +9,15 @@ namespace VRAdultFun
         {
             public override void OnEnter()
             {
+				currentMouth = "Big Smile";
                 //interestValence += 0.3f;
                 morphMouthAction = true;
-                mSmileFullFaceTarget = 0.3f + Random.Range(0.0f,0.25f);
-                mSmileOpenFullFaceTarget = (0.2f * (interestValence / 10.0f)) + Random.Range(0.0f,0.15f);
+                mSmileFullFaceTarget = (0.5f * (interestValence / 10.0f)) + Random.Range(0.0f,0.25f);
+                mSmileOpenFullFaceTarget = (0.5f * (interestValence / 10.0f)) + Random.Range(0.0f,0.15f);
                 mGlareTarget = 0.0f;
-                mHappyTarget = Random.Range(0.0f,0.15f);
-                mFlirtingTarget = 0.2f;
-                mMouthOpenTarget = -0.2f;
+                mHappyTarget = Random.Range(0.0f,0.25f);
+                mFlirtingTarget = 0.4f * (interestValence / 10.0f);
+                mMouthOpenTarget = -0.2f * (interestValence / 10.0f);
                 mMouthSideLeftTarget = 0.0f;
                 mMouthSideRightTarget = 0.0f;
                 mVisFTarget = 0.0f;
@@ -37,7 +38,7 @@ namespace VRAdultFun
             {
                 morphMouthAction = false;
                 //mSmileOpenFullFaceTarget = 0.0f;
-                mMouthOpenTarget = 0.0f;
+                mMouthOpenTarget = Random.Range(0.0f,0.2f);
 				mSmileOpenFullFaceTarget = mSmileOpenFullFaceTarget / 3.0f;
             }
         }

@@ -8,8 +8,9 @@ namespace VRAdultFun
         {
             public override void OnEnter()
             {
-                interestArousal += 0.5f;
-                interestValence += 0.1f;
+				currentEye = "Wink";
+                //interestArousal += 0.5f;
+                //interestValence += 0.1f;
                 morphEyeAction = true;
                 if (Random.Range(0.0f, 100.0f) > 50.0f)
                 {
@@ -26,7 +27,6 @@ namespace VRAdultFun
                     mSmileSimpleRightTarget = 0.4f;
                 }
                 mEyesSquintTarget = 0.0f;
-                morphBlinking = false;
                 Duration = Random.Range(0.25f, 0.3f);
             }
             public override void OnInterrupt(string parameter)
@@ -36,7 +36,7 @@ namespace VRAdultFun
             public override void OnTimeout()
             {
                 morphEyeAction = false;
-                eyeClock = 0.0f;
+                //eyeClock = 0.0f;
                 mEyesClosedLeftTarget = 0.0f;
                 mEyesClosedRightTarget = 0.0f;
             }

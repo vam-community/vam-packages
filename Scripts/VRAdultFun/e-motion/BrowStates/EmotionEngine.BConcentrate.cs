@@ -9,14 +9,15 @@ namespace VRAdultFun
         {
             public override void OnEnter()
             {
-                interestArousal += 0.1f;
-                interestValence += 0.02f;
+				currentBrow = "Concentrate";
+                //interestArousal += 0.1f;
+                //interestValence += 0.02f;
                 morphBrowAction = true;
                 mExcitementTarget = Mathf.Min(0.1f + ((10.0f - interestValence) / 10.0f), 0.3f);
                 mBrowDownTarget = 0.0f;
                 mFlirtingTarget = 0.0f;
                 mBrowUpTarget = 0.0f;
-                mBrowCenterUpTarget = 0.0f;
+                mBrowCenterUpTarget = 0.0f - Random.Range(0.0f,0.3f) * (1.0f - (((interestArousal + interestValence)/2.0f)/10.0f));
                 mBrowOuterUpLeftTarget = 0.0f;
                 mBrowOuterUpRightTarget = 0.0f;
                 mSmileFullFaceTarget = 0.0f;
@@ -24,7 +25,7 @@ namespace VRAdultFun
                 mMouthOpenTarget = 0.0f;
                 mLipsPuckerTarget = 0.0f;
                 mHappyTarget = 0.0f;
-                Duration = Random.Range(0.15f, 1.35f) * lookVariation;
+                Duration = Random.Range(1.15f, 2.35f) * lookVariation;
             }
             public override void OnInterrupt(string parameter)
             {

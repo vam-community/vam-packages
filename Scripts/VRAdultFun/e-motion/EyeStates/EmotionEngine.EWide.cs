@@ -10,12 +10,12 @@ namespace VRAdultFun
             {
                 if (morphBlinking == false)
                 {
-                    interestArousal += 0.5f;
-                    interestValence -= 0.1f;
+					currentEye = "Wide";
+                    //interestArousal += 0.5f;
+                    //interestValence -= 0.1f;
                     morphEyeAction = true;
                     mEyesClosedLeftTarget = -0.10f;
                     mEyesClosedRightTarget = -0.10f;
-                    morphBlinking = false;
                     mEyesSquintTarget = -0.52f;
                     Duration = Random.Range(0.5f, 1.0f) * lookVariation;
                 }

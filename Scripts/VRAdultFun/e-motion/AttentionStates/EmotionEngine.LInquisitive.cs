@@ -12,21 +12,17 @@ namespace VRAdultFun
 				currentLook = "Inquisitive";
 				sexActionNeckX = 0.0f;
                 //LogError("Inquisitive");
-                peronalityAdjustH = Random.Range(-45.0f, 45.0f) * Mathf.Deg2Rad;
-                peronalityAdjustV = Random.Range(0.0f, -25.0f * (pExtraversion / 100.0f)) * Mathf.Deg2Rad;                //gHeadSpeed = 4.0f;
+				if (interestClock <= 0.0f)
+				{
+					shoulderUp = Random.Range(0.0f,0.2f);
+					peronalityAdjustH = Random.Range(-45.0f, 45.0f) * Mathf.Deg2Rad;
+					peronalityAdjustV = Random.Range(0.0f, -15.0f * (pExtraversion / 100.0f)) * Mathf.Deg2Rad;                //gHeadSpeed = 4.0f;
+				}
                 if (Random.Range(0.0f, 100.0f) < 65.0f)
                 {
                     gHeadRollTarget = Random.Range(-25.0f, 25.0f);
                 }
-                else
-                {
-                    //gHeadRollTarget = 0.0f;
-                }
-                if (gHeadRollTarget > 5.0f || gHeadRollTarget < -5.0f)
-                {
-                    gHeadRollTarget = Random.Range(-5.0f, 5.0f);
-                }
-                saccadeAmount = Random.Range(5.0f, 20.0f);
+                saccadeAmount = Random.Range(5.0f, 10.0f);
                 saccadeClock = 0.0f;
                 lookAction = true;
                 lookVariation = Random.Range(0.45f, 0.8f);
@@ -36,9 +32,12 @@ namespace VRAdultFun
 
                 if (Random.Range(0.0f, 100.0f) > 10.0f && morphBrowAction == false)
                 {
-                    if (amGlancing)
+                    if (amGlancing || gAvoid == 1.0f)
                     {
                         browSM.SwitchRandom(new State[] {
+                                    bLowered,
+                                    bRaised,
+                                    bApprehensive,
                                     bApprehensive,
                                     bConcentrate
                                 });
@@ -51,7 +50,7 @@ namespace VRAdultFun
                                         bRaised,
                                         bRaised,
                                         bRaised,
-                                        bOneRaise,
+                                        bConcentrate,
                                         bOneRaise
                                     });
                         }
@@ -71,10 +70,10 @@ namespace VRAdultFun
                                 browSM.SwitchRandom(new State[] {
                                             bRaised,
                                             bRaised,
-                                            bRaised,
-                                            bRaised,
+                                            bApprehensive,
+                                            bConcentrate,
                                             bLowered,
-                                            bOneRaise,
+                                            bLowered,
                                             bOneRaise,
                                             bApprehensive
                                         });
@@ -82,7 +81,7 @@ namespace VRAdultFun
                         }
                     }
                 }
-                if (Random.Range(0.0f, 100.0f) > 5.0f && morphMouthAction == false)
+                if (Random.Range(0.0f, 100.0f) > 25.0f && morphMouthAction == false)
                 {
                     if (lastMouthState == mClosed)
                     {
@@ -94,9 +93,7 @@ namespace VRAdultFun
 									mBiteLip,
 									mBigSmile,
 									mBigSmile,
-                                    mSmirk,
-                                    mSmirk,
-                                    mSideways,
+                                    mOpen,
                                     mSideways
                                 });
                     }
@@ -120,14 +117,12 @@ namespace VRAdultFun
                                         mSmile,
                                         mSideways,
                                         mSideways,
-                                        mSideways,
-                                        mSideways,
                                         mSmirk
                                     });
                         }
                         else
                         {
-                            if (lastMouthState == mBiteLip || lastMouthState == mSmirk || lastMouthState == mSideways)
+                            if (lastMouthState == mBiteLip || lastMouthState == mSideways)
                             {
                                 mouthSM.Switch(mClosed);
                             }
@@ -146,9 +141,8 @@ namespace VRAdultFun
                                             mBigSmile,
                                             mSideways,
 											mSideways,
-                                            mSmirk,
-                                            mSmirk,
-                                            mSmirk
+                                            mOpen,
+                                            mSideways,
                                         });
                             }
                         }
@@ -166,15 +160,15 @@ namespace VRAdultFun
                 float rand = Random.Range(0.0f, 100.0f);
                 if (rand > 33.0f)
                 {
-                    mLHandStraightenTarget = Random.Range(0.0f, 0.2f);
-                    mLHandFistTarget = Random.Range(0.0f, 0.2f);
+                    mLHandStraightenTarget = Random.Range(0.0f, 0.3f);
+                    mLHandFistTarget = Random.Range(0.0f, 0.5f);
                 }
                 if (rand < 66.0f)
                 {
-                    mRHandStraightenTarget = Random.Range(0.0f, 0.2f);
-                    mRHandFistTarget = Random.Range(0.0f, 0.2f);
+                    mRHandStraightenTarget = Random.Range(0.0f, 0.3f);
+                    mRHandFistTarget = Random.Range(0.0f, 0.5f);
                 }
-                Duration = Random.Range(3.0f, 7.0f);
+                Duration = Random.Range(3.0f, 5.0f);
             }
             public override void OnInterrupt(string parameter)
             {

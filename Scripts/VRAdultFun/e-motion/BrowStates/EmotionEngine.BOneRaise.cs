@@ -9,8 +9,9 @@ namespace VRAdultFun
         {
             public override void OnEnter()
             {
-                interestArousal += 0.3f;
-                interestValence += 0.1f;
+				currentBrow = "One Raised";
+                //interestArousal += 0.3f;
+                //interestValence += 0.1f;
                 morphBrowAction = true;
                 mExcitementTarget = 0.0f;
                 mBrowDownTarget = 0.0f;
@@ -35,8 +36,9 @@ namespace VRAdultFun
             public override void OnTimeout()
             {
                 morphBrowAction = false;
-                mBrowOuterUpLeftTarget = 0.0f;
-                mBrowOuterUpRightTarget = 0.0f;
+                //mBrowOuterUpLeftTarget = 0.0f;
+                //mBrowOuterUpRightTarget = 0.0f;
+				currentBrow = "Neutral";
             }
         }
     }

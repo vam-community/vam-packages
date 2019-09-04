@@ -9,18 +9,19 @@ namespace VRAdultFun
         {
             public override void OnEnter()
             {
-                interestArousal += 0.5f;
-                interestValence -= 0.2f;
+				currentBrow = "Apprehensive";
+                //interestArousal += 0.5f;
+                //interestValence -= 0.2f;
                 morphBrowAction = true;
                 mExcitementTarget = 0.0f;
-                mBrowDownTarget = 0.7f;
+                mBrowDownTarget = 0.0f;
                 mBrowUpTarget = 0.0f;
-                mBrowCenterUpTarget = Mathf.Clamp(0.05f + (interestArousal / 10.0f), 0.05f, 0.65f);
+                mBrowCenterUpTarget = Mathf.Clamp(Random.Range(0.25f,1.0f) + (interestArousal / 10.0f), 0.6f, 1.3f);
                 mSmileFullFaceTarget = 0.0f;
                 mSmileOpenFullFaceTarget = 0.0f;
                 mBrowOuterUpLeftTarget = 0.0f;
                 mBrowOuterUpRightTarget = 0.0f;
-                Duration = Random.Range(0.65f, 1.35f);
+                Duration = Random.Range(1.65f, 3.35f);
             }
             public override void OnInterrupt(string parameter)
             {
@@ -30,7 +31,7 @@ namespace VRAdultFun
             {
                 morphBrowAction = false;
                 //mBrowDownTarget = 0.0f;
-                //mBrowCenterUpTarget = 0.0f;
+                mBrowCenterUpTarget = 0.0f;
             }
         }
     }

@@ -1,3 +1,4 @@
+triggercollide.cs
 StateMachine.cs
 AttentionStates/EmotionEngine.LBored.cs      
 AttentionStates/EmotionEngine.LCasual.cs     

@@ -1,4 +1,5 @@
-﻿using Random = UnityEngine.Random;
+﻿using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace VRAdultFun
 {
@@ -8,22 +9,30 @@ namespace VRAdultFun
         {
             public override void OnEnter()
             {
-                if (morphBlinking == false)
-                {
-                    interestArousal -= 0.05f;
-                    interestValence += 0.2f;
+                //if (morphBlinking == false)
+                //{
+					currentEye = "Closed";
                     morphEyeAction = true;
                     if (lookVariation < 0.5f)
                     {
                         lookVariation += 1.0f;
                     }
+					
                     saccadeAmount = Random.Range(0.0f, 0.0f);
-                    mEyesClosedLeftTarget = 0.95f;
-                    mEyesClosedRightTarget = 0.95f;
+					
+					if (Mathf.Abs(Vector3.Angle(eyeController.transform.position - headController.transform.position, headController.followWhenOff.forward)) > 30.0f)
+					{
+						mEyesClosedLeftTarget = eyeCloseMaxMorph + 0.1f;
+						mEyesClosedRightTarget = eyeCloseMaxMorph + 0.1f;
+					}
+					else
+					{
+						mEyesClosedLeftTarget = eyeCloseMaxMorph;
+						mEyesClosedRightTarget = eyeCloseMaxMorph;
+					}
                     mEyesSquintTarget = 0.0f;
-                    morphBlinking = false;
-                    Duration = 0.1f;
-                }
+                    Duration = Random.Range(1.5f,2.5f);
+                //}
             }
             public override void OnInterrupt(string parameter)
             {
@@ -32,7 +41,7 @@ namespace VRAdultFun
             public override void OnTimeout()
             {
                 morphEyeAction = false;
-                eyeClock = 0.0f;
+                //eyeClock = 0.0f;
             }
         }
     }

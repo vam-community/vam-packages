@@ -8,8 +8,9 @@ namespace VRAdultFun
         {
             public override void OnEnter()
             {
+				currentMouth = "Closed";
                 morphMouthAction = true;
-                mTongueInOutTarget = 0.5f;
+                mTongueInOutTarget = 1.0f;
                 mTongueSideSideTarget = 0.0f;
 				mHappyTarget = 0.0f;
                 mMouthOpenTarget = -0.20f;
@@ -19,7 +20,9 @@ namespace VRAdultFun
                 mSmileSimpleLeftTarget = Random.Range(0.0f, 0.1f);
                 mSmileSimpleRightTarget = mSmileSimpleLeftTarget;
 				mSmileFullFaceTarget = Random.Range(0.0f, 0.3f);
-                Duration = Random.Range(0.5f, 2.0f) * lookVariation;
+                Duration = Random.Range(1.5f, 3.0f) * lookVariation;
+				mDeserveItTarget = 0.0f;
+				mTakingItTarget = 0.0f;
             }
             public override void OnInterrupt(string parameter)
             {
@@ -28,6 +31,10 @@ namespace VRAdultFun
             public override void OnTimeout()
             {
                 morphMouthAction = false;
+				if (interestArousal > 5.0f)
+				{
+					mMouthOpenTarget = Random.Range(0.0f,0.2f);
+				}
             }
         }
     }

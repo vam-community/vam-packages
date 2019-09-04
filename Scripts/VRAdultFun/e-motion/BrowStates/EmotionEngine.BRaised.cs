@@ -9,8 +9,9 @@ namespace VRAdultFun
         {
             public override void OnEnter()
             {
-                interestArousal += 0.1f;
-                interestValence -= 0.15f;
+				currentBrow = "Raised";
+                //interestArousal += 0.1f;
+                //interestValence -= 0.15f;
                 morphBrowAction = true;
                 mExcitementTarget = 0.0f;
                 if (mBrowDownTarget > 0.0f)
@@ -26,7 +27,7 @@ namespace VRAdultFun
                 mBrowCenterUpTarget = 0.0f;
                 mBrowOuterUpLeftTarget = 0.0f;
                 mBrowOuterUpRightTarget = 0.0f;
-                Duration = Random.Range(0.15f, 0.35f) * lookVariation;
+                Duration = Random.Range(1.55f, 2.35f) * lookVariation;
             }
             public override void OnInterrupt(string parameter)
             {

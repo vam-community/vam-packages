@@ -8,6 +8,7 @@ namespace VRAdultFun
         {
             public override void OnEnter()
             {
+				currentMouth = "Smile";
                 //interestArousal += 0.1f;
                 //interestValence += 0.2f;
                 morphMouthAction = true;
@@ -15,13 +16,13 @@ namespace VRAdultFun
                 mSmileOpenFullFaceTarget = 0.2f;
 				mHappyTarget = Random.Range(0.0f,0.22f);
                 mGlareTarget = 0.0f;
-                mFlirtingTarget = 0.1f;
+                mFlirtingTarget = 0.1f * (interestValence / 10.0f);
                 mMouthOpenTarget = -0.2f;
                 mVisFTarget = 0.0f;
                 mMouthSideLeftTarget = 0.0f;
                 mMouthSideRightTarget = 0.0f;
                 mSmileSimpleLeftTarget = 0.0f;
-                mSmileSimpleRightTarget = 0.7f;
+                mSmileSimpleRightTarget = 0.6f * (interestValence / 10.0f);
                 mTongueInOutTarget = 1.0f;
                 mTongueSideSideTarget = 0.0f;
                 mTongueBendTipTarget = 0.0f;
@@ -37,7 +38,7 @@ namespace VRAdultFun
             {
                 morphMouthAction = false;
                 //mSmileFullFaceTarget = 0.0f;
-                mMouthOpenTarget = 0.0f;
+                mMouthOpenTarget = Random.Range(0.0f,0.2f);
             }
         }
     }

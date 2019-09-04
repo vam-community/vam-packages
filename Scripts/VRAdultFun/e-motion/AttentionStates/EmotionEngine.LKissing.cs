@@ -11,21 +11,45 @@ namespace VRAdultFun
             {
 				currentLook = "Kissing";
                 //LogError("Kissing");
-                peronalityAdjustH = 0.0f;
-                peronalityAdjustV = 0.0f;
+				shoulderUp = Random.Range(0.2f,0.2f);
+				sexActionNeckX = 0.0f;
                 //gHeadSpeed = 1.0f;
                 interestKissing = true;
                 saccadeAmount = Random.Range(0.0f, 0.0f);
                 saccadeClock = 0.0f;
-                Vector3 eulerAngles = playerHeadTransform.localEulerAngles;
-                if (eulerAngles.z < 180.0f)
-                {
-                    gHeadRollTarget = Random.Range(5.0f, 40.0f);
-                }
-                else
-                {
-                    gHeadRollTarget = Random.Range(-5.0f, -40.0f);
-                }
+				tempFloat2 = playerHeadController.transform.eulerAngles.z - headController.transform.eulerAngles.z;
+				if (tempFloat2 > 180.0f){tempFloat2 -= 360.0f;}
+				if (tempFloat2 < -180.0f){tempFloat2 += 360.0f;}
+				//gHeadRollTarget = Mathf.Clamp(tempFloat + Random.Range(-15.0f,15.0f),-40.0f,40.0f);
+				tempFloat = playerHeadTransform.eulerAngles.z;
+				if (tempFloat > 180.0f)
+				{
+					tempFloat = (360.0f - tempFloat) * -1.0f;
+				}
+				if (tempFloat > 0.0f && tempFloat < 15.0f)
+				{
+					gHeadRollTarget = tempFloat + 20.0f;
+				}
+				if (tempFloat < 0.0f && tempFloat > -15.0f)
+				{
+					gHeadRollTarget = tempFloat - 20.0f;
+				}
+				if (Mathf.Abs(tempFloat2) > 20.0f && Mathf.Abs(tempFloat2) < 50.0f)
+				{
+					//gHeadRollTarget -= tempFloat2 / 2.0f;
+				}
+				if (gHeadRollTarget < 0.0f)
+				{
+					gHeadRollTarget = Mathf.Clamp(gHeadRollTarget,-40.0f,-15.0f);
+				}
+				else
+				{
+					gHeadRollTarget = Mathf.Clamp(gHeadRollTarget,15.0f,40.0f);
+				}
+				
+				
+                peronalityAdjustH = 0.0f * Mathf.Deg2Rad;//Random.Range(-2.0f,2.0f) * Mathf.Deg2Rad;
+                peronalityAdjustV = 0.0f * Mathf.Deg2Rad;//Random.Range(-1.0f,1.0f) * Mathf.Deg2Rad;
 
                 lookAction = true;
                 lookVariation = Random.Range(1.0f, 1.0f);
@@ -35,10 +59,22 @@ namespace VRAdultFun
                 browSM.SwitchRandom(new State[] {
                             bApprehensive,
                             bRaised,
-                            bOneRaise
+                            bConcentrate
                         });
-                mouthSM.Switch(mKiss);
-                eyesSM.Switch(eClosed);
+					mouthSM.Switch(mKiss);
+						eyesSM.SwitchRandom(new State[] {
+									eClosed,
+									eClosed,
+									eClosed,
+									eClosed,
+									eClosed,
+									eClosed,
+									eClosed,
+									eClosed,
+									eClosed,
+									eClosed,
+									eOpen
+								});
                 float rand = Random.Range(0.0f, 100.0f);
                 if (rand > 33.0f)
                 {

@@ -8,11 +8,15 @@
             {
                 //lookVariation = 0.0f;
                 //lookVariation = Random.Range(9.0f,11.0f);
+                Duration = 0.07f;
                 morphEyeAction = true;
-                morphBlinking = true;
-                mEyesClosedLeftTarget = 0.95f;
-                mEyesClosedRightTarget = 0.95f;
-                Duration = 0.1f;
+				if (blinkTimer > 0.3f)
+				{
+					morphBlinking = true;
+					mEyesClosedLeftTarget = eyeCloseMaxMorph - 0.1f;
+					mEyesClosedRightTarget = eyeCloseMaxMorph - 0.1f;
+					blinkTimer = 0.0f;
+				}
             }
             public override void OnInterrupt(string parameter)
             {
@@ -23,6 +27,7 @@
                 morphEyeAction = false;
                 mEyesClosedLeftTarget = 0.0f;
                 mEyesClosedRightTarget = 0.0f;
+				//eyeClock = 0.0f;
             }
         }
     }

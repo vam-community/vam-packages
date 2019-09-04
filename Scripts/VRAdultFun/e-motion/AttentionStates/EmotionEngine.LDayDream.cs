@@ -11,6 +11,8 @@ namespace VRAdultFun
             {
                 peronalityAdjustH = 0.0f;
                 peronalityAdjustV = 0.0f;
+				sexActionNeckX = 0.0f;
+				shoulderUp = Random.Range(0.0f,0.3f);
 				currentLook = "Daydream";
                 //LogError("Daydream");
                 //gHeadSpeed = 7.0f;

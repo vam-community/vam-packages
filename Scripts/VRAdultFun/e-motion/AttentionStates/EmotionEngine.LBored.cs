@@ -11,9 +11,11 @@ namespace VRAdultFun
             {
 				currentLook = "Bored";
                 //LogError("Bored");
+				shoulderUp = Random.Range(0.0f,0.1f);
                 peronalityAdjustH = Random.Range(-15.0f, 15.0f) * Mathf.Deg2Rad;
                 peronalityAdjustV = Random.Range(-2.0f, 10.0f) * Mathf.Deg2Rad;
-                //gHeadSpeed = 3.0f;
+				sexActionNeckX = 0.0f;
+				gHeadSpeed = 20.0f;
                 if (Random.Range(0.0f, 100.0f) < 20.0f)
                 {
                     gHeadRollTarget = Random.Range(-30.0f, 30.0f);
