@@ -10,4 +10,4 @@ This repository contains a shared list of hosted packages, as an alternative to 
 
 ## File structure
 
-Place files in `Scripts/{package}/{version}/{...files}`, where `{package}` and `{version}` match the [Virt-A-Mate Scripts Registry](https://github.com/vam-community/vam-registry).
+Place files in `Scripts/{author}/{package}/{version}/{...files}`, where `{author}`, `{package}` and `{version}` match the [Virt-A-Mate Scripts Registry](https://github.com/vam-community/vam-registry).
