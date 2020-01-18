@@ -1,5 +1,7 @@
 # Virt-A-Mate Packages
 
+**This project has been deprecated in favor of Virt-A-Mate 1.19 package support**
+
 This repository contains a shared list of hosted packages, as an alternative to creating your own repositories and to archive scripts that were only available through reddit.
 
 ## Important notices
